@@ -66,3 +66,5 @@ We WANT real time active users so if a marker is not updated, it is removed. Thi
 
 Also, this make us have a sub-list of the real time markers we have them separated from statically added (login required) user markers.
 
+		commit dbdb83af8503407b8b55e459f448640bb44ce0f0
+

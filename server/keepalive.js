@@ -8,13 +8,13 @@ Meteor.methods({
     	//console.log('new connection', connection, 'from arker', marker_id);
     }
     else {
-	    console.log('keepalive from: ', marker_id);
+	    console.log('keepalive from', marker_id);
     	Connections.update({marker_id: marker_id}, {$set: {last_seen: (new Date()).getTime()}});
     }
   }
 });
 
-// Clean up dead users after seconds idle
+// Clean up dead users after idle seconds
 var idle = 15; // seconds
 Meteor.setInterval(function () {
   var now = (new Date()).getTime();
@@ -26,7 +26,7 @@ Meteor.setInterval(function () {
 				console.log('removed live marker', marker._id);
 			}
 		}
-		console.log('removed connection: ', connection._id);
+		console.log('removed connection', connection._id);
 		Connections.remove(connection._id);
   });
-}, 10000);
+}, idle);
