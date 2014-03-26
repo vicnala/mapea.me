@@ -58,3 +58,11 @@ Then we use a `Deps.autorun` to update our marker when `location` changes. In `c
 			}
 		});
 
+
+Keepalive
+---------
+
+We WANT real time active users so if a marker is not updated, it is removed. This is done with a keepalive function that refreshes an entry at the `Connections` collection.
+
+Also, this make us have a sub-list of the real time markers we have them separated from statically added (login required) user markers.
+
