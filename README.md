@@ -68,3 +68,43 @@ Also, this make us have a sub-list of the real time markers we have them separat
 
 		commit dbdb83af8503407b8b55e459f448640bb44ce0f0
 
+
+The Map
+-------
+
+We use [leaflet](http://leafletjs.com/) Meteor package (`mrt add leaflet`).
+
+The `client/views/map/map.js` initialize the map object and sets two reactive functions:
+
+
+### Setting the view
+
+We have our location updated into a (Session) reactive data source so we can keep the map always centered on the user location.
+
+Inside `Template.mapMarkers.rendered` function:
+
+		Deps.autorun(function () {
+			var location = Session.get('location');
+			if (location) {
+				window.map.setView([location[1], location[0]]);
+			}
+		});
+
+
+### Managing map markers
+
+We have to synchronize the database markers with the map markers. To do so we set up an `[observe](http://docs.meteor.com/#observe)` on the markers cursor to easily add/change/remove the map markers in real time.
+
+		Markers.find({}).observe({
+    added: function(mark) {
+    	// add a map marker
+    },
+
+    changed: function(mark) {
+    	// update a map marker
+    },
+
+    removed: function(mark) {
+    	// remove a map marker
+    }
+  });

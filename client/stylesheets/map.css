@@ -1,0 +1,93 @@
+.map {
+  height: 400px; 
+  border: solid 1px black;
+}
+
+.first {
+  margin-top: 10px;
+}
+
+.second {
+  margin-top: 5px; 
+  margin-bottom: 5px;
+}
+
+
+.title {
+  margin-top: 0; 
+  margin-bottom: 10px; 
+  text-align: center;
+}
+
+.notice {
+  text-align: center;
+}
+
+.leaflet-animated-icon {
+  border-radius: 50%;
+  border: none;
+  opacity: .2;
+  background: black;
+}
+
+.leaflet-div-icon {
+    border-radius: 50%;
+    border: none;
+    line-height: 30px;
+    font-family: verdana;
+    font-size: 10px;
+    text-align: center;
+    color: black;
+    opacity: .8;
+    vertical-align:middle;
+}
+
+.leaflet-div-icon.public {
+    background: #49AFCD;
+}
+
+.leaflet-div-icon.blue {
+    background: #49AFCD;
+}
+
+.leaflet-div-icon.private {
+    background: #DA4F49;
+}
+
+.leaflet-div-icon.red {
+    background: #DA4F49;
+}
+
+.leaflet-div-icon.orange {
+    background: #D2691E;
+}
+
+.leaflet-div-icon.yellow {
+    background: #FFD700;
+}
+
+.map-load-more {
+  padding-top: 5px;
+}
+
+@media all and (max-width: 480px) {
+  /* styles for iPhone/Android landscape (and really narrow browser windows) */
+  .notice {
+    font-size: 11px;
+  }
+}
+
+@media all and (max-width: 320px) {
+  /* styles for iPhone/Android portrait */
+  .notice {
+      font-size: 11px;
+  }
+}
+
+@media all and (max-width: 240px) {
+  /* styles for smaller devices */
+  .notice{
+    font-size: 11px;
+  }
+}
+
