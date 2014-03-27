@@ -96,15 +96,33 @@ Inside `Template.mapMarkers.rendered` function:
 We have to synchronize the database markers with the map markers. To do so we set up an `[observe](http://docs.meteor.com/#observe)` on the markers cursor to easily add/change/remove the map markers in real time.
 
 		Markers.find({}).observe({
-    added: function(mark) {
-    	// add a map marker
-    },
+	    added: function(mark) {
+	    	// add a map marker
+	    },
 
-    changed: function(mark) {
-    	// update a map marker
-    },
+	    changed: function(mark) {
+	    	// update a map marker
+	    },
 
-    removed: function(mark) {
-    	// remove a map marker
-    }
-  });
+	    removed: function(mark) {
+	    	// remove a map marker
+	    }
+  	});
+
+
+### Enable double-click to add markers for loggedin users
+
+		Deps.autorun(function(){
+		  if(Meteor.userId()){
+			  window.map.on('dblclick', function(e) {
+			    Markers.insert({
+			      nick: 'new!',
+			      location: [e.latlng.lng, e.latlng.lat],
+			      //...
+			    });
+			  });
+		  }
+		  else {
+		  	window.map.off('dblclick', null);
+		  }
+		});

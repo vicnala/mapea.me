@@ -19,6 +19,24 @@ Template.mapMarkers.rendered = function() {
 		}
 	});
 
+	// Enable double click marker insert for logged in user
+	Deps.autorun(function(){
+	  if(Meteor.userId()){
+		  window.map.on('dblclick', function(e) {
+		    Markers.insert({
+		      nick: 'new!',
+		      message: 'Hi all!',
+		      location: [e.latlng.lng, e.latlng.lat],
+		      public: true,
+		      submitted: new Date().getTime()
+		    });
+		  });
+	  }
+	  else {
+	  	window.map.off('dblclick', null);
+	  }
+	});
+
 	// Obderve the markers collection to add/change/remove the map markers
   Markers.find({}).observe({
     added: function(mark) {
