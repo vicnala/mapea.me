@@ -14,6 +14,7 @@ Template.mapMarkers.rendered = function() {
 	Deps.autorun(function () {
 		var location = Session.get('location');
 		if (location) {
+			// TODO: update the database marker (observe.changed will center the map)
 			window.map.setView([location[1], location[0]]);
 		}
 	});
@@ -28,11 +29,10 @@ Template.mapMarkers.rendered = function() {
         {
           title: mark.nick,
           _id: mark._id,
-          secret: mark.secret,
           icon: createIcon(mark.nick, 'red')
         }
       ).addTo(window.map).bindPopup(
-        '<b>' + mark.nick + '</b><br>' + mark.message + '<br><a href="/markers/' + mark._id + '" class="discuss btn">Discuss</a>'
+        '<b>' + mark.nick + '</b><br>' + mark.message + '<br><a href="/markers/' + mark._id + '" class="discuss btn">Comment</a>'
       );
 
       return marker;
@@ -41,7 +41,6 @@ Template.mapMarkers.rendered = function() {
     changed: function(mark) {
       var key, layers, val, _results;
       var id = Session.get('myMarkerId');
-      var secret = Session.get('secret');
       layers = window.map._layers;
       _results = [];
       for (key in layers) {
@@ -53,7 +52,6 @@ Template.mapMarkers.rendered = function() {
           if (val.options._id === mark._id){
             console.log('this is the updated marker');
             val.options.title = mark.nick;
-            val.options.secret = mark.secret;
             val._latlng.lat = mark.location[1];
             val._latlng.lon = mark.location[0];
 
@@ -65,15 +63,8 @@ Template.mapMarkers.rendered = function() {
               window.map.setView([mark.location[1], mark.location[0]], 17);
             }
             else {
-              console.log('  and does NOT have my _id');
-              if (val.options.secret === secret) {
-                console.log('    but has my secret: orange');
-                val.setIcon(createIcon(mark.nick, 'orange'));
-              }
-              else {
-                console.log('    and does NOT have my secret: red');
-                val.setIcon(createIcon(mark.nick, 'red'));
-              }
+              console.log('  and does NOT have my _id: red');
+              val.setIcon(createIcon(mark.nick, 'red'));
             }
             val.update();
           }
@@ -83,16 +74,7 @@ Template.mapMarkers.rendered = function() {
               //do nothing
             }
             else {
-              if (val.options.secret === secret) {
-                console.log('  but has my secret: orange');
-                val.setIcon(createIcon(val.options.title, 'orange'));
-              }
-              else {
-                if (val.hasOwnProperty('_icon')) {
-                  console.log('  and does NOT have my secret: red');
-                  val.setIcon(createIcon(val.options.title, 'red'));
-                }
-              }
+              val.setIcon(createIcon(val.options.title, 'red'));
             }
           }
         }
