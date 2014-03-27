@@ -1,4 +1,6 @@
 Template.mapMarkers.rendered = function() {
+	var intervalId;
+
 	// initialize the map
 	window.map = L.map('map', {
     doubleClickZoom: false
@@ -10,14 +12,79 @@ Template.mapMarkers.rendered = function() {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
   }).addTo(window.map);
 
+
+
   // Set the view of the map constantly centered in the user location
 	Deps.autorun(function () {
 		var location = Session.get('location');
+
 		if (location) {
-			// TODO: update the database marker (observe.changed will center the map)
-			window.map.setView([location[1], location[0]]);
+			if(Meteor.userId()){
+	      var myMarkerId = Session.get('myMarkerId');
+
+	      if (!myMarkerId){
+	        // remove the temp map marker
+	        var key, layers, val;
+	        layers = window.map._layers;
+	        for (key in layers) {
+	          val = layers[key];
+	          if (val.options._id === 'tempId') {
+	            window.map.removeLayer(val);
+	          }
+	        }
+
+	        // insert a new marker
+	        var newMarkerId = Markers.insert({
+	          nick: 'me!',
+	          message: 'Hi all!',
+	          location: [location[0], location[1]],
+	          public: true,
+	          live: true,
+	          submitted: new Date().getTime()
+	        });
+
+	        Session.set('myMarkerId', newMarkerId);
+
+	        // Setup remote keepalive call
+	        Meteor.call('keepalive', newMarkerId);
+	        intervalId = Meteor.setInterval(function () {
+	          Meteor.call('keepalive', Session.get('myMarkerId'));
+	        }, 10000);
+	      }
+	      else {
+	        // update my marker
+	        Markers.update(myMarkerId, {$set: {location: location}});
+	      }
+        // center the map
+        window.map.setView([location[1], location[0]]);
+			}
+			else {
+				// clear keepalive timer
+				if (intervalId) {
+					Meteor.clearInterval(intervalId);
+				}
+
+				// TODO: delete the database marker (to make disappear the map marker instantaneously)
+
+				// setup a temp map marker
+	      var marker = L.marker(
+	        {lon: location[0], lat: location[1]},
+	        {
+	          title: 'me!',
+	          _id: 'tempId',
+	          icon: createIcon('me!', 'blue')
+	        }
+	      ).addTo(window.map).bindPopup(
+	        '<b>Wellcome to <em>mapea.me!</em></b><br>Login to start using this <em>amazing</em> app!'
+	      ).openPopup();
+
+				// center the map
+				window.map.setView([location[1], location[0]]);
+			}
 		}
 	});
+
+
 
 	// Enable double click marker insert for logged in user
 	Deps.autorun(function(){
@@ -36,6 +103,8 @@ Template.mapMarkers.rendered = function() {
 	  	window.map.off('dblclick', null);
 	  }
 	});
+
+
 
 	// Obderve the markers collection to add/change/remove the map markers
   Markers.find({}).observe({
