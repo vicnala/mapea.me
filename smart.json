@@ -1,9 +1,15 @@
 {
+  "meteor": {
+    "tag": "v0.7.2"
+  },
   "packages": {
-    "iron-router": {"version": "0.6.2"},
+    "iron-router": {
+      "version": "0.6.2"
+    },
     "spin": {},
-    "accounts-ui-bootstrap-dropdown": {},
-    "leaflet": {},
-    "event-hooks": {}
+    "accounts-ui-bootstrap-dropdown": {
+      "version": "0.6.5.1"
+    },
+    "leaflet": {}
   }
 }

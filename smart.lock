@@ -6,9 +6,10 @@
         "version": "0.6.2"
       },
       "spin": {},
-      "accounts-ui-bootstrap-dropdown": {},
-      "leaflet": {},
-      "event-hooks": {}
+      "accounts-ui-bootstrap-dropdown": {
+        "version": "0.6.5.1"
+      },
+      "leaflet": {}
     },
     "packages": {
       "iron-router": {
@@ -23,18 +24,13 @@
       },
       "accounts-ui-bootstrap-dropdown": {
         "git": "https://github.com/erobit/meteor-accounts-ui-bootstrap-dropdown.git",
-        "tag": "v0.8.0",
-        "commit": "5544504272378bdca58d4101737d1f368f779cb4"
+        "tag": "v0.6.5.1",
+        "commit": "c8b29d2e7f8611d6dec9d6d23c1c2b94e000b0fb"
       },
       "leaflet": {
         "git": "https://github.com/bevanhunt/meteor-leaflet.git",
         "tag": "v0.3.6",
         "commit": "d9e3bdb824145c1078e52945909bb1cf38724da5"
-      },
-      "event-hooks": {
-        "git": "https://github.com/BenjaminRH/meteor-event-hooks.git",
-        "tag": "v1.4.3",
-        "commit": "ba4f3d7887748458618d29615492906f0c88d31c"
       }
     }
   }
