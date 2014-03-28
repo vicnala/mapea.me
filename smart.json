@@ -1,8 +1,9 @@
 {
   "packages": {
-    "iron-router": {},
+    "iron-router": {"version": "0.6.2"},
     "spin": {},
     "accounts-ui-bootstrap-dropdown": {},
-    "leaflet": {}
+    "leaflet": {},
+    "event-hooks": {}
   }
 }
