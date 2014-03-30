@@ -1,5 +1,3 @@
-var liveMarkerId;
-
 Template.mapMarkers.rendered = function() {
 	var intervalId;
 
@@ -19,18 +17,25 @@ Template.mapMarkers.rendered = function() {
 		var location = Session.get('location');
 		if (location) {
 			if(Meteor.userId()){
-	      //var liveMarkerId = Session.get('liveMarkerId');
+	      var liveMarkerId = Session.get('liveMarkerId');
 	      if (!liveMarkerId){
 	        // remove the temp map marker
-					removeMapTempMarker();
+					removeMapMarker('tempId');
 	        // insert a new marker
-	        liveMarkerId = Markers.insert(defaultMarker(location));
+	        var id = Markers.insert(defaultMarker(location));
 	        // set the 'liveMarkerId' session variable
-	        Session.set('liveMarkerId', liveMarkerId);
+	        Session.set('liveMarkerId', id);
+
+	        // The 'insert' is fastest than 'liveMrkerId' assignment
+	        // so the marker is added in observe function with color red.
+	        // TODO: find a way to make the color change instantaneously.
+
+	        
 	        // Set the user profile variable 'liveMarker'
-	        Meteor.users.update({_id:Meteor.user()._id}, {$set:{"profile.liveMarker": liveMarkerId}})
+	        //Meteor.users.update({_id:Meteor.user()._id}, {$set:{"profile.liveMarker": id}})
+
 	        // Setup remote keepalive call
-	        Meteor.call('keepalive', liveMarkerId);
+	        Meteor.call('keepalive', id);
 	        intervalId = Meteor.setInterval(function () {
 	          Meteor.call('keepalive', Session.get('liveMarkerId'));
 	        }, 10000);
@@ -46,21 +51,32 @@ Template.mapMarkers.rendered = function() {
         window.map.setView([location[1], location[0]]);
 			}
 			else {
-				// Clear Session variable liveMarkerId
-				delete Session.keys['liveMarkerId'];
+				// TODO: delete the database marker (to make disappear the map marker instantaneously)
+				//Markers.remove(Session.get('liveMarkerId'));
+				////// TODO: THIS WILL NOT WORK WHEN INSECURE REMOVED /////
+
+				// disable dblclick
+				window.map.off('dblclick', null);
+
+				// clear session and map markers
+				var ifId = Session.get('liveMarkerId');
+				if (ifId) {
+					// Clear Session variable liveMarkerId
+					delete Session.keys['liveMarkerId'];
+  				removeMapMarker(ifId);
+					
+				}
+				else {
+					removeMapMarker('tempId');
+				}
+
 				// clear keepalive timer
 				if (intervalId) {
 					Meteor.clearInterval(intervalId);
 				}
-
-				// TODO: delete the database marker (to make disappear the map marker instantaneously)
-
-				// disable dblclick
-				window.map.off('dblclick', null);
+				
 				// setup a new temp map marker
-				removeMapTempMarker();
 				defaultMapMarker(location);
-				// center the map
 				window.map.setView([location[1], location[0]]);
 			}
 		}
@@ -100,7 +116,7 @@ Template.mapMarkers.rendered = function() {
 
             // TODO: update .bindPopup()
 
-            if (val.options._id === liveMarkerId) {
+            if (val.options._id === Session.get('liveMarkerId')) {
               console.log('  and has my _id: blue and pan');
               val.setIcon(createIcon(mark.nick, 'blue'));
               window.map.setView([mark.location[1], mark.location[0]], 17);
@@ -113,7 +129,7 @@ Template.mapMarkers.rendered = function() {
           }
           else {
             console.log('this is NOT the updated marker');
-            if (val.options._id === liveMarkerId) {
+            if (val.options._id === Session.get('liveMarkerId')) {
               //do nothing
             }
             else {
@@ -154,12 +170,12 @@ var createIcon = function(nick, color) {
 }
 
 
-var removeMapTempMarker = function() {
+var removeMapMarker = function(markId) {
   var key, layers, val;
   layers = window.map._layers;
   for (key in layers) {
     val = layers[key];
-    if (val.options._id === 'tempId') {
+    if (val.options._id === markId) {
   		window.map.removeLayer(val);
     }
   }
@@ -190,27 +206,13 @@ var defaultMapMarker = function(location) {
   ).openPopup();
 }
 
-var defaultMarker = function(location) {
-	return {
-		nick: 'me!',
-		message: 'Hi all!',
-		location: [location[0], location[1]],
-		public: true,
-		live: true,
-		submitted: new Date().getTime()
-	};
-}
-
-var clicks = 0;
 
 var enabledbclick = function(location) {
   // enable double click marker insert for logged in user
   window.map.on('dblclick', function(e) {
   	if(Meteor.userId()){
-  		clicks = clicks + 1;
-  		console.log(clicks);
 	    Markers.insert({
-	      nick: 'new!',
+	      nick: Meteor.user().username,
 	      message: 'Hi all!',
 	      location: [e.latlng.lng, e.latlng.lat],
 	      public: true,
