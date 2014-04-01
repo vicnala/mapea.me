@@ -21,6 +21,7 @@ Template.mapMarkers.rendered = function() {
 	      if (!liveMarkerId){
 	        // remove the temp map marker
 					removeMapMarker('tempId');
+
 	        // insert a new marker
 	        var id = Markers.insert(defaultMarker(location));
 	        // set the 'liveMarkerId' session variable
@@ -183,7 +184,7 @@ var removeMapMarker = function(markId) {
 
 var defaultMarker = function(location) {
 	return {
-		nick: 'me!',
+		nick: Meteor.user().profile.nick,
 		message: 'Hi all!',
 		location: [location[0], location[1]],
 		public: true,
@@ -212,7 +213,7 @@ var enabledbclick = function(location) {
   window.map.on('dblclick', function(e) {
   	if(Meteor.userId()){
 	    Markers.insert({
-	      nick: Meteor.user().username,
+	      nick: Meteor.user().profile.nick,
 	      message: 'Hi all!',
 	      location: [e.latlng.lng, e.latlng.lat],
 	      public: true,
