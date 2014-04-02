@@ -80,7 +80,9 @@ Template.mapMarkers.rendered = function() {
           icon: createIcon(mark.nick, 'red')
         }
       ).addTo(window.map).bindPopup(
-        '<b>' + mark.nick + '</b><br>' + mark.message + '<br><a href="/markers/' + mark._id + '" class="discuss btn">Comment</a>'
+        '<b>' + mark.nick + '</b><br>' + mark.message + 
+        '<br><a href="/markers/' + mark._id + 
+        '" class="discuss btn">Comment</a>'
       );
       return marker;
     },
@@ -176,6 +178,7 @@ var defaultMapMarker = function(loc) {
 var insertMarker = function(loc) {
   var marker = {
     nick: Meteor.user().profile.nick,
+    userId: Meteor.userId(),
     message: 'Hi all!',
     location: [loc[0], loc[1]],
     public: true,

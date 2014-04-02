@@ -1,0 +1,28 @@
+<template name="markerEdit">
+  <form class="main">
+    <div class="control-group">
+      <label class="control-label" for="nick">Nick</label>
+      <div class="controls">
+        <input name="nick" type="text" value="{{nick}}" placeholder="Your nick name"/>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="message">Message</label>
+      <div class="controls">
+        <textarea name="message" type="text">{{message}}</textarea>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <input type="submit" value="Edit" class="btn btn-primary"/>
+      </div>
+    </div>
+  </form>
+    {{#if noLiveMarker}}
+      <div class="control-group">
+        <div class="controls">
+          <a class="btn btn-danger delete" href="#">Delete marker</a>
+        </div>
+      </div>
+    {{/if}}
+</template>

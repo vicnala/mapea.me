@@ -6,6 +6,13 @@ Markers.allow({
   remove: ownsDocument
 });
 
+Markers.deny({
+  update: function(userId, marker, fieldNames) {
+    // may only edit the following fields:
+    return (_.without(fieldNames, 'nick', 'message', 'public', 'location').length > 0);
+  }
+});
+
 Meteor.methods({
   marker: function(markerAttributes) {
     var user = Meteor.user(),
