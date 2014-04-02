@@ -1,5 +1,9 @@
+var intervalId;
+var myUserId;
+var location;
+var liveMarkerId;
+
 Template.mapMarkers.rendered = function() {
-	var intervalId;
 
 	// initialize the map
 	window.map = L.map('map', {
@@ -12,76 +16,57 @@ Template.mapMarkers.rendered = function() {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
   }).addTo(window.map);
 
-  // Set the view of the map constantly centered in the user location
-	Deps.autorun(function () {
-		var location = Session.get('location');
-		if (location) {
-			if(Meteor.userId()){
-	      var liveMarkerId = Session.get('liveMarkerId');
-	      if (!liveMarkerId){
-	        // remove the temp map marker
-					removeMapMarker('tempId');
 
-	        // insert a new marker
-	        var id = Markers.insert(defaultMarker(location));
-	        // set the 'liveMarkerId' session variable
-	        Session.set('liveMarkerId', id);
+  Deps.autorun(function () {
+    location = Session.get('location');
+    if (location) {
+      if(myUserId) {
+        Markers.update(Meteor.user().profile.liveMarkerId, {$set: {location: location}});
+      }
+      else {
+        // setup the wellcome marker
+        removeMapMarker('tempId');
+        defaultMapMarker(location);
+      }
+      window.map.setView([location[1], location[0]]);
+    }
+  });
 
-	        // The 'insert' is fastest than 'liveMrkerId' assignment
-	        // so the marker is added in observe function with color red.
-	        // TODO: find a way to make the color change instantaneously.
 
-	        
-	        // Set the user profile variable 'liveMarker'
-	        //Meteor.users.update({_id:Meteor.user()._id}, {$set:{"profile.liveMarker": id}})
+  Deps.autorun(function () {
+    myUserId = Meteor.userId();
+    if(myUserId) {
+      liveMarkerId = Meteor.user().profile.liveMarkerId;
+      // remove the temp map marker
+      removeMapMarker('tempId');
+      // enable the user marker
+      Markers.update(liveMarkerId, {$set: {public: true}});
+      // enable double click to place markers
+      window.map.on('dblclick', function(e) {
+        insertMarker([e.latlng.lng, e.latlng.lat]);
+      });
+      // Setup remote keepalive call
+      Meteor.call('keepalive', liveMarkerId);
+      if (!intervalId) {
+        intervalId = Meteor.setInterval(function () {
+          Meteor.call('keepalive', liveMarkerId);
+        }, 10000);
+      }
+    }
+    else {
+      // disable dblclick
+      window.map.off('dblclick', null);
+      // clear keepalive timer
+      Meteor.clearInterval(intervalId);
+      intervalId = undefined;
+      // setup the wellcome marker
+      removeMapMarker('tempId');
+      if (!location)
+        location = [0,0];
+      defaultMapMarker(location);
+    }
+  });
 
-	        // Setup remote keepalive call
-	        Meteor.call('keepalive', id);
-	        intervalId = Meteor.setInterval(function () {
-	          Meteor.call('keepalive', Session.get('liveMarkerId'));
-	        }, 10000);
-
-	        // enable double click to place markers
-	        enabledbclick();
-	      }
-	      else {
-	        // update my marker
-	        Markers.update(liveMarkerId, {$set: {location: location}});
-	      }
-        // center the map
-        window.map.setView([location[1], location[0]]);
-			}
-			else {
-				// TODO: delete the database marker (to make disappear the map marker instantaneously)
-				//Markers.remove(Session.get('liveMarkerId'));
-				////// TODO: THIS WILL NOT WORK WHEN INSECURE REMOVED /////
-
-				// disable dblclick
-				window.map.off('dblclick', null);
-
-				// clear session and map markers
-				var ifId = Session.get('liveMarkerId');
-				if (ifId) {
-					// Clear Session variable liveMarkerId
-					delete Session.keys['liveMarkerId'];
-  				removeMapMarker(ifId);
-					
-				}
-				else {
-					removeMapMarker('tempId');
-				}
-
-				// clear keepalive timer
-				if (intervalId) {
-					Meteor.clearInterval(intervalId);
-				}
-				
-				// setup a new temp map marker
-				defaultMapMarker(location);
-				window.map.setView([location[1], location[0]]);
-			}
-		}
-	});
 
 	// Obderve the markers collection to add/change/remove the map markers
   Markers.find({}).observe({
@@ -110,32 +95,23 @@ Template.mapMarkers.rendered = function() {
 
         } else {
           if (val.options._id === mark._id){
-            console.log('this is the updated marker');
+            console.log('updated marker', mark._id);
             val.options.title = mark.nick;
             val._latlng.lat = mark.location[1];
             val._latlng.lon = mark.location[0];
 
             // TODO: update .bindPopup()
 
-            if (val.options._id === Session.get('liveMarkerId')) {
-              console.log('  and has my _id: blue and pan');
+            if (val.options._id === liveMarkerId) {
+              console.log('  has my _id: blue and pan');
               val.setIcon(createIcon(mark.nick, 'blue'));
               window.map.setView([mark.location[1], mark.location[0]], 17);
             }
             else {
-              console.log('  and does NOT have my _id: red');
+              console.log('  does not have my _id: red');
               val.setIcon(createIcon(mark.nick, 'red'));
             }
             val.update();
-          }
-          else {
-            console.log('this is NOT the updated marker');
-            if (val.options._id === Session.get('liveMarkerId')) {
-              //do nothing
-            }
-            else {
-              val.setIcon(createIcon(val.options.title, 'red'));
-            }
           }
         }
       }
@@ -182,21 +158,10 @@ var removeMapMarker = function(markId) {
   }
 }
 
-var defaultMarker = function(location) {
-	return {
-		nick: Meteor.user().profile.nick,
-		message: 'Hi all!',
-		location: [location[0], location[1]],
-		public: true,
-		live: true,
-		submitted: new Date().getTime()
-	};
-}
 
-
-var defaultMapMarker = function(location) {
+var defaultMapMarker = function(loc) {
   L.marker(
-    {lon: location[0], lat: location[1]},
+    {lon: loc[0], lat: loc[1]},
     {
       title: 'me!',
       _id: 'tempId',
@@ -208,17 +173,17 @@ var defaultMapMarker = function(location) {
 }
 
 
-var enabledbclick = function(location) {
-  // enable double click marker insert for logged in user
-  window.map.on('dblclick', function(e) {
-  	if(Meteor.userId()){
-	    Markers.insert({
-	      nick: Meteor.user().profile.nick,
-	      message: 'Hi all!',
-	      location: [e.latlng.lng, e.latlng.lat],
-	      public: true,
-	      submitted: new Date().getTime()
-	    });
-	  }
+var insertMarker = function(loc) {
+  var marker = {
+    nick: Meteor.user().profile.nick,
+    message: 'Hi all!',
+    location: [loc[0], loc[1]],
+    public: true,
+    live: false
+  };
+
+  Meteor.call('marker', marker, function(error, id) {
+    if (error)
+      return alert(error.reason);
   });
 }

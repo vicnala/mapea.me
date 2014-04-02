@@ -1,3 +1,3 @@
 Meteor.publish('markers', function() {
-  return Markers.find();
+  return Markers.find({public: true});
 })
