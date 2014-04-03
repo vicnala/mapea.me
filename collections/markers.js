@@ -18,6 +18,12 @@ Meteor.methods({
     var user = Meteor.user(),
       markerWithSameNick = Markers.findOne({nick: markerAttributes.nick});
 
+    var userMarkersCount = Markers.find({userId: user._id}).count();
+
+    if (userMarkersCount > 1) {
+      throw new Meteor.Error(401, "By now, only one static marker per user is allowed.");
+    }
+
     // ensure the user is logged in
     if (!user)
       throw new Meteor.Error(401, "You need to login to enter new markers");

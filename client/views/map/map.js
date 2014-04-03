@@ -186,7 +186,8 @@ var insertMarker = function(loc) {
   };
 
   Meteor.call('marker', marker, function(error, id) {
-    if (error)
-      return alert(error.reason);
+    if (error) {
+      throwError(error.reason);
+    }
   });
 }
