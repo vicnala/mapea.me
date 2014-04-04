@@ -3,14 +3,14 @@ Accounts.onCreateUser(function(options, user) {
   user.profile = options.profile ? options.profile : {};
   user.profile.nick = user.username;
 
-  // setup the user live marker
   var marker = {
     nick: user.profile.nick,
     userId: user._id,
     message: 'Hi all!',
     location: [0, 0],
     public: true,
-    live: true
+    live: true,
+    submitted: new Date().getTime()
   };
 
   var id = Markers.insert(marker);

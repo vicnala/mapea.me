@@ -15,9 +15,9 @@ Markers.deny({
 
 Meteor.methods({
   marker: function(markerAttributes) {
-    var user = Meteor.user(),
-      markerWithSameNick = Markers.findOne({nick: markerAttributes.nick});
 
+    var user = Meteor.user();
+    //var markerWithSameNick = Markers.findOne({nick: markerAttributes.nick});
     var userMarkersCount = Markers.find({userId: user._id}).count();
 
     if (userMarkersCount > 1) {

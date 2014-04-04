@@ -126,3 +126,11 @@ We have to synchronize the database markers with the map markers. To do so we se
 		  	window.map.off('dblclick', null);
 		  }
 		});
+
+
+TODOS
+
+* onLogOut hook to remove 'public' flag of the user marker and make dissapear the map marker instantaneously.
+* Create a method to delete markers that does not allow delete the user liveMarker
+* Create a method to update live markers and update 'submitted' into it
+* Disable HighAccuracy at geolocation.js and make it optional to the user
