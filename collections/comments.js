@@ -22,7 +22,8 @@ Meteor.methods({
 
     // update the marker with the number of comments
     Markers.update(comment.markerId, {$inc: {commentsCount: 1}});
-
+    // now create a notification, informing the user that there's been a comment
+    createCommentNotification(comment);
     // create the comment, save the id
     comment._id = Comments.insert(comment);
 

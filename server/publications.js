@@ -5,3 +5,7 @@ Meteor.publish('markers', function() {
 Meteor.publish('comments', function(markerId) {
 	return Comments.find({markerId: markerId});
 });
+
+Meteor.publish('notifications', function() {
+  return Notifications.find({userId: this.userId});
+});

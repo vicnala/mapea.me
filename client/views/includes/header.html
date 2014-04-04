@@ -15,6 +15,11 @@
           <li class="">
             <a href="{{pathFor 'markersList'}}">List</a>
           </li>
+          {{#if currentUser}}
+            <li class="dropdown">
+              {{> notifications}}
+            </li>
+          {{/if}}
         </ul>
         <ul class="nav pull-right">
           <li>{{> loginButtons}}</li>
