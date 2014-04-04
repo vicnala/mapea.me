@@ -10,6 +10,7 @@ Accounts.onCreateUser(function(options, user) {
     location: [0, 0],
     public: true,
     live: true,
+    commentsCount: 0,
     submitted: new Date().getTime()
   };
 

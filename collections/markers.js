@@ -68,6 +68,7 @@ Meteor.methods({
       // pick out the whitelisted keys
       var marker = _.extend(_.pick(markerAttributes, 'nick', 'location', 'public', 'message'), {
         userId: user._id,
+        commentsCount: 0,
         submitted: new Date().getTime()
       });
       markerId = Markers.insert(marker);

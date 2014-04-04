@@ -77,6 +77,47 @@ We use [leaflet](http://leafletjs.com/) Meteor package (`mrt add leaflet`).
 The `client/views/map/map.js` initialize the map object and sets two reactive functions:
 
 
+### Initializing
+
+Inside `Template.mapMarkers.rendered` function:
+
+	  // initialize the map
+	  window.map = L.map('map', {
+	    doubleClickZoom: false
+	  }).setView([0,0], 17);
+
+	  L.tileLayer.provider('CloudMade', {
+	    apiKey: 'fb852d3401af4315bb0aa4ed825090f3',
+	    styleID: '997',
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	  }).addTo(window.map);
+
+	  // enable double click to place markers
+	  window.map.on('dblclick', onDbClick);
+
+
+### Double-click function to add markers for loggedin users
+
+		function onDbClick(e) {
+		  if (Meteor.userId()) {
+		    var marker = {
+		      nick: Meteor.user().profile.nick,
+		      userId: Meteor.userId(),
+		      message: 'Hi all!',
+		      location: [e.latlng.lng, e.latlng.lat],
+		      public: true,
+		      live: false
+		    };
+
+		    Meteor.call('marker', marker, function(error, id) {
+		      if (error) {
+		        throwError(error.reason);
+		      }
+		    });
+		  }
+		}
+
+
 ### Setting the view
 
 We have our location updated into a (Session) reactive data source so we can keep the map always centered on the user location.
@@ -109,28 +150,19 @@ We have to synchronize the database markers with the map markers. To do so we se
 	    }
   	});
 
+As we are using pages with iron router we need to `stop` the `observe` function when we leave the map template.
 
-### Enable double-click to add markers for loggedin users
+		Template.mapMarkers.destroyed = function ( ) {
+		  handle.stop();
+		}
 
-		Deps.autorun(function(){
-		  if(Meteor.userId()){
-			  window.map.on('dblclick', function(e) {
-			    Markers.insert({
-			      nick: 'new!',
-			      location: [e.latlng.lng, e.latlng.lat],
-			      //...
-			    });
-			  });
-		  }
-		  else {
-		  	window.map.off('dblclick', null);
-		  }
-		});
+
+
 
 
 TODOS
 
-* onLogOut hook to remove 'public' flag of the user marker and make dissapear the map marker instantaneously.
+* onLogOut hook to remove 'public' flag of the user marker and make dissapear the map marker instantaneously. (A work arround will be remove it from the local collection).
 * Create a method to delete markers that does not allow delete the user liveMarker
 * Create a method to update live markers and update 'submitted' into it
 * Disable HighAccuracy at geolocation.js and make it optional to the user

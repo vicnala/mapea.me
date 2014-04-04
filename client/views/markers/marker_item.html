@@ -3,7 +3,9 @@
     <div class="marker-content">
       <h3>{{nick}}</h3><h5>{{message}}</h5>
       <p>
-        {{location}}
+        {{location}},
+        submitted by {{author}},
+        <a href="{{pathFor 'markerPage'}}">{{commentsCount}} comments</a>
         {{#if ownMarker}}<a href="{{pathFor 'markerEdit'}}">Edit</a>{{/if}}
     	</p>
     </div>

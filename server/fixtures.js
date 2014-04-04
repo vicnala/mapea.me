@@ -29,6 +29,7 @@ function addTestMarkers (user, place, lat, lon, rad, count) {
       message: 'Hi all!',
       location: [lon + pmlon*Math.random()*rad, lat + pmlat*Math.random()*rad],
       public: true,
+      commentsCount: 0,
       submitted: now - i * 3600 * 1000
     });
   }
