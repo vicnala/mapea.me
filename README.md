@@ -157,12 +157,33 @@ As we are using pages with iron router we need to `stop` the `observe` function 
 		}
 
 
+Following
+---------
+
+This is one of the most important feature of the app.
+
+* Only live markers (created by the server/hooks.js) can have followers.
+
+
+
+Groups
+------
+
+This the other most important feature 
+
+
 
 
 
 TODOS
 
-* onLogOut hook to remove 'public' flag of the user marker and make dissapear the map marker instantaneously. (A work arround will be remove it from the local collection).
+* Load more at the marker list controller
+* Suscribe to the following marker
+
+* onLogOut hook to remove 'public' flag of the user marker and make disappear the map marker instantaneously. (A work around will be remove it from the local collection).
 * Create a method to delete markers that does not allow delete the user liveMarker
 * Create a method to update live markers and update 'submitted' into it
 * Disable HighAccuracy at geolocation.js and make it optional to the user
+* [Deleting a post](https://github.com/DiscoverMeteor/Microscope/issues/90)
+* Disable follow yourself
+

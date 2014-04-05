@@ -1,9 +1,13 @@
 <template name="markerItem">
   <div class="marker">
+    <a href="#" class="follow btn {{followedClass}}">⬆</a>
     <div class="marker-content">
       <h3>{{nick}}</h3><h5>{{message}}</h5>
       <p>
-        <a href="{{pathFor 'markerPage'}}">{{commentsCount}} comments</a>
+        {{#if live}}
+          {{pluralize follows "Follower"}},
+        {{/if}}
+        <a href="{{pathFor 'markerPage'}}">{{pluralize commentsCount "comment"}}</a>
         {{#if ownMarker}}<a href="{{pathFor 'markerEdit'}}">Edit</a>{{/if}}
     	</p>
     </div>

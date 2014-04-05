@@ -1,5 +1,13 @@
 Template.markersList.helpers({
-  markers: function() {
-    return Markers.find({}, {sort: {submitted: -1}});
+  markersWithRank: function() {
+    return this.markers.map(function(marker, index, cursor) {
+      marker._rank = index;
+      return marker;
+    });
+  },
+
+  hasMoreMarkers: function(){
+    this.markers.rewind();
+    return Router.current().limit() == this.markers.fetch().length;
   }
 });

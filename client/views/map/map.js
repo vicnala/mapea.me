@@ -33,6 +33,14 @@ Template.mapMarkers.rendered = function() {
         defaultMapMarker(location);
       }
       window.map.setView([location[1], location[0]]);
+
+      // Set the box for suscriptions
+      var bounds = window.map.getBounds();
+      var box = [
+          [ bounds._southWest.lng, bounds._southWest.lat],
+          [ bounds._northEast.lng, bounds._northEast.lat]
+        ];
+      Session.set('box', box);
     }
   });
 

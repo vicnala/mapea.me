@@ -76,4 +76,19 @@ Meteor.methods({
 
     return markerId;
   },
+  
+  follow: function(markerId) {
+    var user = Meteor.user();
+    // ensure the user is logged in
+    if (!user)
+      throw new Meteor.Error(401, "You need to login to follow someone");
+    
+    Markers.update({
+      _id: markerId,
+      followers: {$ne: user._id}
+    }, {
+      $addToSet: {followers: user._id},
+      $inc: {follows: 1}
+    });
+  }
 });

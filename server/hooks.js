@@ -11,6 +11,8 @@ Accounts.onCreateUser(function(options, user) {
     public: true,
     live: true,
     commentsCount: 0,
+    follows: 0,
+    followers: [],    
     submitted: new Date().getTime()
   };
 

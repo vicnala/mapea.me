@@ -16,6 +16,9 @@
             <a href="{{pathFor 'markersList'}}">List</a>
           </li>
           {{#if currentUser}}
+            <li class="{{activeRouteClass 'userMarkers'}}">
+              <a href="{{pathFor 'userMarkers'}}">Mine</a>
+            </li>
             <li class="dropdown">
               {{> notifications}}
             </li>

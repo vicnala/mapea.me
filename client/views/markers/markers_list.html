@@ -1,7 +1,10 @@
 <template name="markersList">
   <div class="markers">
-    {{#each markers}}
+    {{#each markersWithRank}}
       {{> markerItem}}
     {{/each}}
+    {{#if hasMoreMarkers}}
+    	<a class="load-more" href="{{nextPath}}">Load more</a>
+    {{/if}}
   </div>
 </template>
