@@ -10,14 +10,22 @@ Template.mapMarkers.rendered = function() {
     doubleClickZoom: false
   }).setView([0,0], 17);
 
+  /*
   L.tileLayer.provider('CloudMade', {
     apiKey: 'fb852d3401af4315bb0aa4ed825090f3',
     styleID: '997',
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
   }).addTo(window.map);
+*/
+
+  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
   // enable double click to place markers
   window.map.on('dblclick', onDbClick);
+  // Set box bounds on map move
+  window.map.on('moveend', onMapMove);
 
   location = Session.get('location');
 
@@ -33,14 +41,6 @@ Template.mapMarkers.rendered = function() {
         defaultMapMarker(location);
       }
       window.map.setView([location[1], location[0]]);
-
-      // Set the box for suscriptions
-      var bounds = window.map.getBounds();
-      var box = [
-          [ bounds._southWest.lng, bounds._southWest.lat],
-          [ bounds._northEast.lng, bounds._northEast.lat]
-        ];
-      Session.set('box', box);
     }
   });
 
@@ -184,3 +184,12 @@ function onDbClick(e) {
   }
 }
 
+function onMapMove(e) {
+  // Set the box for suscriptions
+  var bounds = window.map.getBounds();
+  var box = [
+      [ bounds._southWest.lng, bounds._southWest.lat],
+      [ bounds._northEast.lng, bounds._northEast.lat]
+    ];
+  Session.set('box', box);
+}

@@ -24,7 +24,7 @@ function addTestMarkers (user, place, lat, lon, rad, count) {
     var pmlon = Math.random() < 0.5 ? -1 : 1;
     var pmlat = Math.random() < 0.5 ? -1 : 1;
     Markers.insert({
-      nick: user.profile.nick,
+      nick: user.profile.nick + i,
       userId: user._id,
       message: 'Hi all!',
       location: [lon + pmlon*Math.random()*rad, lat + pmlat*Math.random()*rad],

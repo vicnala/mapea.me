@@ -10,9 +10,7 @@ MapeaMe! is a real time geolocated micro social network.
 Geolocation watch
 -----------------
 
-First thing we need is geolocate the user so we start a `navigator.geolocation.watchPosition` at the `geolocation.js` file inside the `client/lib` directory witch is supposed to load first.
-
-**TODO: Is it the right way?**
+First thing we need is geolocate the user so we start a `navigator.geolocation.watchPosition` at the `geolocation.js` file inside the `client/lib` directory witch is supposed to load first. **Is this the right way?**
 
 When a location is triggered by the `success` function, it updates the Session variable `location`.
 
@@ -34,39 +32,30 @@ When a location is triggered by the `success` function, it updates the Session v
 		  console.warn('ERROR(' + err.code + '): ' + err.message);
 		};
 
-Then we use a `Deps.autorun` to update our marker when `location` changes. In `client/main.js`
+Then we use a `Deps.autorun` function inside the `Template.mapMarkers.rendered` function to update our marker when `location` changes. In `client/views/map/map.js`
 
-		Deps.autorun(function () {
-			var location = Session.get('location');
-			if (location) {
-				var myMarkerId = Session.get('myMarkerId');
-				if (!myMarkerId){
-					// insert a new marker
-			  	var newMarkerId = Markers.insert({
-			      nick: 'me!',
-			      message: 'Hi all!',
-			      location: [location[0], location[1]],
-			      public: true,
-			      submitted: new Date().getTime()
-			    });
-			    Session.set('myMarkerId', newMarkerId);
-				}
-				else {
-					// update my marker
-					Markers.update(myMarkerId, {$set: {location: location}});
-				}
-			}
-		});
+	  Deps.autorun(function () {
+	    location = Session.get('location');
+	    if (location) {
+	      if(myUserId) {
+	        Markers.update(Meteor.user().profile.liveMarkerId, {$set: {location: location}});
+	      }
+	      else {
+	        // setup the wellcome marker
+	        removeMapMarker('tempId');
+	        defaultMapMarker(location);
+	      }
+	      window.map.setView([location[1], location[0]]);
+	    }
+	  });
 
 
 Keepalive
 ---------
 
-We WANT real time active users so if a marker is not updated, it is removed. This is done with a keepalive function that refreshes an entry at the `Connections` collection.
+We WANT real time active users so if a marker is not updated, it's property `public` is set to false and this makes the marker disappear from publications. This is done with a keepalive function that refreshes a time stamp entry at the `Connections` collection. Then a `setInterval` function at the server, checks the time stamp and update the markers if a predefined timeout is reached.
 
-Also, this make us have a sub-list of the real time markers we have them separated from statically added (login required) user markers.
-
-		commit dbdb83af8503407b8b55e459f448640bb44ce0f0
+We have the 'keepalive' server method and a `setInterval` function at `server/hooks.js` and the `setInterval` function for the client at `client/helpers/keepalive.js`.
 
 
 The Map
@@ -132,6 +121,47 @@ Inside `Template.mapMarkers.rendered` function:
 		});
 
 
+### Geolocated reactive subscriptions
+
+We want view the markers within the map view so we need a geologated subscription. We can just get the map bounds in a map event like 'moveend' and setup a Session variable we can use in subscriptions.
+
+On `client/views/map/map.js`:
+
+		Template.mapMarkers.rendered = function() {
+			//...
+		  // Set box bounds on map move
+		  window.map.on('moveend', onMapMove);
+		  //...
+		}
+
+		function onMapMove(e) {
+		  // Set the box for suscriptions
+		  var bounds = window.map.getBounds();
+		  var box = [
+		      [ bounds._southWest.lng, bounds._southWest.lat],
+		      [ bounds._northEast.lng, bounds._northEast.lat]
+		    ];
+		  Session.set('box', box);
+		}
+
+At the `findOptions` function of the `lib/router.js`
+
+	  findOptions: function() {
+      return {box: Session.get('box'), sort: this.sort, limit: this.limit()};
+	  },
+
+And finally at the `server/publications.js` file we ensure a GEO2D insdex at the location property of the  markers collection:
+
+		Markers._ensureIndex({location: "2d"});
+
+		Meteor.publish('markers', function(options) {
+		  return Markers.find({$and: [{public: true}, {location: {$within: {$box: options.box}}}]}, {sort: options.sort, limit: options.limit});
+		});
+
+
+
+
+
 ### Managing map markers
 
 We have to synchronize the database markers with the map markers. To do so we set up an `[observe](http://docs.meteor.com/#observe)` on the markers cursor to easily add/change/remove the map markers in real time.
@@ -177,8 +207,7 @@ This the other most important feature
 
 TODOS
 
-* Load more at the marker list controller
-* Suscribe to the following marker
+* Subscribe to the following marker
 
 * onLogOut hook to remove 'public' flag of the user marker and make disappear the map marker instantaneously. (A work around will be remove it from the local collection).
 * Create a method to delete markers that does not allow delete the user liveMarker
@@ -187,3 +216,9 @@ TODOS
 * [Deleting a post](https://github.com/DiscoverMeteor/Microscope/issues/90)
 * Disable follow yourself
 
+
+
+iOS/Android apps
+================
+
+* https://www.discovermeteor.com/blog/blonk-building-tinder-for-jobs-with-meteor-for-mobile/
