@@ -217,8 +217,34 @@ TODOS
 * Disable follow yourself
 
 
+* Limitar el zoom del mapa
+* Una colección local para meter a los que sigues y calcular los bounds?
+	No creo ... el cliente tiene todos los datos que puede necesitar, habrá que hacer un find() en un Deps? y punto.
+
+* Generar una notificación al hacer "Follow"
+
+* Drop-down is not working! Loggin items not showing when logout
+
+
+
 
 iOS/Android apps
 ================
 
 * https://www.discovermeteor.com/blog/blonk-building-tinder-for-jobs-with-meteor-for-mobile/
+
+
+
+
+I20140529-10:02:26.801(2)? keepalive from ni5qCjbL9pTmHNfpw
+I20140529-10:02:36.801(2)? keepalive from ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.089(2)? removed live marker ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.093(2)? removed connection 6gGNmPcFNEHtk7JFg
+I20140529-10:03:37.103(2)? removed live marker ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.105(2)? removed connection 6gGNmPcFNEHtk7JFg
+I20140529-10:03:37.129(2)? removed live marker ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.131(2)? removed connection 6gGNmPcFNEHtk7JFg
+I20140529-10:03:37.554(2)? removed live marker ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.559(2)? removed connection 6gGNmPcFNEHtk7JFg
+I20140529-10:03:37.622(2)? removed live marker ni5qCjbL9pTmHNfpw
+I20140529-10:03:37.625(2)? removed connection 6gGNmPcFNEHtk7JFg
